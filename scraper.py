@@ -26,7 +26,7 @@ import urllib.parse
 class ImageScraper:
     def __init__(self, output_dir="dataset", target_size=None):
         """Initialize the scraper with output directory and optional target size"""
-        self.base_url = "add website"
+        self.base_url = "https://www5.javmost.com/pornstar/all/"
         self.output_dir = output_dir
         self.target_size = target_size
         self.categories = set()
@@ -391,6 +391,31 @@ class ImageScraper:
             # Print page info for debugging
             print(f"Page Title: {driver.title}")
             print(f"Current URL: {driver.current_url}")
+            
+            # Implement infinite scrolling
+            print("\nStarting infinite scroll...")
+            last_height = driver.execute_script("return document.body.scrollHeight")
+            scroll_count = 0
+            max_scrolls = 20  # Adjust this value to control how many times to scroll
+            
+            while scroll_count < max_scrolls:
+                # Scroll down to bottom
+                driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                
+                # Wait for new content to load
+                time.sleep(2)
+                
+                # Calculate new scroll height
+                new_height = driver.execute_script("return document.body.scrollHeight")
+                
+                # Break if no new content loaded (height didn't change)
+                if new_height == last_height:
+                    print("No more content to load")
+                    break
+                    
+                last_height = new_height
+                scroll_count += 1
+                print(f"Scrolled {scroll_count} times, loading more content...")
             
             # Save page source for analysis
             with open("page_source.html", "w", encoding="utf-8") as f:
